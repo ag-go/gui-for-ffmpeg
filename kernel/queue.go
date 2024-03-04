@@ -11,8 +11,8 @@ type Queue struct {
 }
 
 type StatusContract interface {
-	name() string
-	ordinal() int
+	Name() string
+	Ordinal() int
 }
 
 const (
@@ -31,11 +31,11 @@ var statusTypeStrings = []string{
 	"error",
 }
 
-func (status StatusType) name() string {
+func (status StatusType) Name() string {
 	return statusTypeStrings[status]
 }
 
-func (status StatusType) ordinal() int {
+func (status StatusType) Ordinal() int {
 	return int(status)
 }
 

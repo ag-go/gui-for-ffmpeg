@@ -1,15 +1,15 @@
-[completed]
+[completedQueue]
 hash = "sha1-398c7d4f7b0d522afb930769c0fbb1a9f4b61fbe"
 other = "Дайын"
 
-[inProgress]
+[errorQueue]
+hash = "sha1-72aecd9ad85642d84d62dbbf3cf70953c5f696c7"
+other = "Қате"
+
+[inProgressQueue]
 hash = "sha1-eff79c40e2100ae5fadf3a7d99336025edcca8b5"
 other = "Орындалуда"
 
-[queue]
-hash = "sha1-aec93b16baeaf55fed871075c9494a460e4a91b8"
-other = "Кезек"
-
-[waiting]
+[waitingQueue]
 hash = "sha1-307429dd84150877080c4bbff2b340d1e7dadff2"
 other = "Күту"

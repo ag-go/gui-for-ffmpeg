@@ -38,7 +38,7 @@ other = "Allow file to be overwritten"
 hash = "sha1-f60bb5f761024d973834b5e9d25ceebce2c85f94"
 other = "choose"
 
-[completed]
+[completedQueue]
 hash = "sha1-398c7d4f7b0d522afb930769c0fbb1a9f4b61fbe"
 other = "Completed"
 
@@ -90,6 +90,10 @@ other = "this is not FFprobe"
 hash = "sha1-da7b37d7df3fafbd153665b13888413d52b24c17"
 other = "Failed to determine FFprobe version"
 
+[errorQueue]
+hash = "sha1-72aecd9ad85642d84d62dbbf3cf70953c5f696c7"
+other = "Error"
+
 [errorSelectedFolderSave]
 hash = "sha1-83da899677cdc90e4344e3b94ee03c46b51bee4c"
 other = "You haven't selected a folder to save!"
@@ -114,7 +118,7 @@ other = "File for conversion:"
 hash = "sha1-6a45cef900c668effcb2ab10da05855c1fd10f6f"
 other = "Help"
 
-[inProgress]
+[inProgressQueue]
 hash = "sha1-eff79c40e2100ae5fadf3a7d99336025edcca8b5"
 other = "In Progress"
 
@@ -174,10 +178,14 @@ other = "Checking FFmpeg for serviceability..."
 hash = "sha1-92df86371f6c3a06ca1e4754f113142776a32d49"
 other = "You can download it from here"
 
+[total]
+hash = "sha1-3b5143902e0c5c84459aedf918e17604d9735b94"
+other = "Total"
+
 [unzipRun]
 hash = "sha1-c554dad13026668a1f6adf3171837c5d51bbac36"
 other = "Unpacked..."
 
-[waiting]
+[waitingQueue]
 hash = "sha1-307429dd84150877080c4bbff2b340d1e7dadff2"
 other = "Waiting"
