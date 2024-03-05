@@ -16,11 +16,7 @@ type LocalizerContract interface {
 	SetCurrentLanguage(lang Lang) error
 	SetCurrentLanguageByCode(code string) error
 	GetCurrentLanguage() *CurrentLanguage
-	AddListener(listener LocalizerListenerContract)
-}
-
-type LocalizerListenerContract interface {
-	Change(localizerService LocalizerContract)
+	AddChangeCallback(messageID string, callback func(text string))
 }
 
 type Lang struct {
@@ -34,11 +30,16 @@ type CurrentLanguage struct {
 	localizerDefault *i18n.Localizer
 }
 
+type changeCallback struct {
+	messageID string
+	callback  func(text string)
+}
+
 type Localizer struct {
-	bundle            *i18n.Bundle
-	languages         []Lang
-	currentLanguage   *CurrentLanguage
-	localizerListener map[int]LocalizerListenerContract
+	bundle          *i18n.Bundle
+	languages       []Lang
+	currentLanguage *CurrentLanguage
+	changeCallbacks map[int]*changeCallback
 }
 
 func NewLocalizer(directory string, languageDefault language.Tag) (*Localizer, error) {
@@ -63,7 +64,7 @@ func NewLocalizer(directory string, languageDefault language.Tag) (*Localizer, e
 			localizer:        localizerDefault,
 			localizerDefault: localizerDefault,
 		},
-		localizerListener: map[int]LocalizerListenerContract{},
+		changeCallbacks: map[int]*changeCallback{},
 	}, nil
 }
 
@@ -123,13 +124,14 @@ func (l Localizer) GetCurrentLanguage() *CurrentLanguage {
 	return l.currentLanguage
 }
 
-func (l Localizer) AddListener(listener LocalizerListenerContract) {
-	l.localizerListener[len(l.localizerListener)] = listener
+func (l Localizer) AddChangeCallback(messageID string, callback func(text string)) {
+	l.changeCallbacks[len(l.changeCallbacks)] = &changeCallback{messageID: messageID, callback: callback}
 }
 
 func (l Localizer) eventSetCurrentLanguage() {
-	for _, listener := range l.localizerListener {
-		listener.Change(l)
+	for _, changeCallback := range l.changeCallbacks {
+		text := l.GetMessage(&i18n.LocalizeConfig{MessageID: changeCallback.messageID})
+		changeCallback.callback(text)
 	}
 }
 

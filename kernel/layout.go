@@ -61,12 +61,11 @@ type QueueLayoutObjectContract interface {
 type QueueLayoutObject struct {
 	QueueListContract QueueListContract
 
-	queue                   QueueListContract
-	container               *fyne.Container
-	items                   map[int]QueueLayoutItem
-	localizerService        LocalizerContract
-	layoutLocalizerListener LayoutLocalizerListenerContract
-	queueStatisticsFormat   *queueStatisticsFormat
+	queue                 QueueListContract
+	container             *fyne.Container
+	items                 map[int]QueueLayoutItem
+	localizerService      LocalizerContract
+	queueStatisticsFormat *queueStatisticsFormat
 }
 
 type QueueLayoutItem struct {
@@ -78,17 +77,17 @@ type QueueLayoutItem struct {
 	status *StatusContract
 }
 
-func NewQueueLayoutObject(queue QueueListContract, localizerService LocalizerContract, layoutLocalizerListener LayoutLocalizerListenerContract) *QueueLayoutObject {
+func NewQueueLayoutObject(queue QueueListContract, localizerService LocalizerContract) *QueueLayoutObject {
 	title := widget.NewLabel(localizerService.GetMessage(&i18n.LocalizeConfig{MessageID: "queue"}))
 	title.TextStyle.Bold = true
 
-	layoutLocalizerListener.AddItem("queue", func(text string) {
+	localizerService.AddChangeCallback("queue", func(text string) {
 		title.Text = text
 		title.Refresh()
 	})
 
 	items := map[int]QueueLayoutItem{}
-	queueStatisticsFormat := newQueueStatisticsFormat(localizerService, layoutLocalizerListener, &items)
+	queueStatisticsFormat := newQueueStatisticsFormat(localizerService, &items)
 
 	queueLayoutObject := &QueueLayoutObject{
 		queue: queue,
@@ -96,10 +95,9 @@ func NewQueueLayoutObject(queue QueueListContract, localizerService LocalizerCon
 			container.NewHBox(title, queueStatisticsFormat.completed.widget, queueStatisticsFormat.error.widget),
 			container.NewHBox(queueStatisticsFormat.inProgress.widget, queueStatisticsFormat.waiting.widget, queueStatisticsFormat.total.widget),
 		),
-		items:                   items,
-		localizerService:        localizerService,
-		layoutLocalizerListener: layoutLocalizerListener,
-		queueStatisticsFormat:   queueStatisticsFormat,
+		items:                 items,
+		localizerService:      localizerService,
+		queueStatisticsFormat: queueStatisticsFormat,
 	}
 
 	queue.AddListener(queueLayoutObject)
@@ -281,39 +279,6 @@ func (p Progress) Run(stdOut io.ReadCloser, stdErr io.ReadCloser) error {
 	return nil
 }
 
-type LayoutLocalizerItem struct {
-	messageID string
-	callback  func(text string)
-}
-
-type LayoutLocalizerListener struct {
-	itemCurrentId *int
-	items         map[int]*LayoutLocalizerItem
-}
-
-type LayoutLocalizerListenerContract interface {
-	AddItem(messageID string, callback func(text string))
-}
-
-func NewLayoutLocalizerListener() *LayoutLocalizerListener {
-	id := 0
-	return &LayoutLocalizerListener{
-		itemCurrentId: &id,
-		items:         map[int]*LayoutLocalizerItem{},
-	}
-}
-
-func (l LayoutLocalizerListener) AddItem(messageID string, callback func(text string)) {
-	*l.itemCurrentId += 1
-	l.items[*l.itemCurrentId] = &LayoutLocalizerItem{messageID: messageID, callback: callback}
-}
-
-func (l LayoutLocalizerListener) Change(localizerService LocalizerContract) {
-	for _, item := range l.items {
-		item.callback(localizerService.GetMessage(&i18n.LocalizeConfig{MessageID: item.messageID}))
-	}
-}
-
 type queueStatistics struct {
 	widget *widget.Check
 	title  string
@@ -327,12 +292,12 @@ type queueStatisticsFormat struct {
 	total      *queueStatistics
 }
 
-func newQueueStatisticsFormat(localizerService LocalizerContract, layoutLocalizerListener LayoutLocalizerListenerContract, queueItems *map[int]QueueLayoutItem) *queueStatisticsFormat {
-	checkWaiting := newQueueStatistics("waitingQueue", localizerService, layoutLocalizerListener)
-	checkInProgress := newQueueStatistics("inProgressQueue", localizerService, layoutLocalizerListener)
-	checkCompleted := newQueueStatistics("completedQueue", localizerService, layoutLocalizerListener)
-	checkError := newQueueStatistics("errorQueue", localizerService, layoutLocalizerListener)
-	checkTotal := newQueueStatistics("total", localizerService, layoutLocalizerListener)
+func newQueueStatisticsFormat(localizerService LocalizerContract, queueItems *map[int]QueueLayoutItem) *queueStatisticsFormat {
+	checkWaiting := newQueueStatistics("waitingQueue", localizerService)
+	checkInProgress := newQueueStatistics("inProgressQueue", localizerService)
+	checkCompleted := newQueueStatistics("completedQueue", localizerService)
+	checkError := newQueueStatistics("errorQueue", localizerService)
+	checkTotal := newQueueStatistics("total", localizerService)
 
 	queueStatisticsFormat := &queueStatisticsFormat{
 		waiting:    checkWaiting,
@@ -524,7 +489,7 @@ func (f queueStatisticsFormat) allUnCheckboxChecked() {
 	f.error.widget.Refresh()
 }
 
-func newQueueStatistics(messaigeID string, localizerService LocalizerContract, layoutLocalizerListener LayoutLocalizerListenerContract) *queueStatistics {
+func newQueueStatistics(messaigeID string, localizerService LocalizerContract) *queueStatistics {
 	checkbox := widget.NewCheck("", nil)
 	checkbox.Checked = true
 
@@ -539,7 +504,7 @@ func newQueueStatistics(messaigeID string, localizerService LocalizerContract, l
 
 	queueStatistics.formatText(false)
 
-	layoutLocalizerListener.AddItem(messaigeID, func(text string) {
+	localizerService.AddChangeCallback(messaigeID, func(text string) {
 		queueStatistics.title = strings.ToLower(text)
 		queueStatistics.formatText(true)
 		queueStatistics.widget.Refresh()

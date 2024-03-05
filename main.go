@@ -37,15 +37,13 @@ func init() {
 
 	ffPathUtilities = &kernel.FFPathUtilities{FFmpeg: "", FFprobe: ""}
 	convertorService := kernel.NewService(ffPathUtilities)
-	layoutLocalizerListener := kernel.NewLayoutLocalizerListener()
-	localizerService.AddListener(layoutLocalizerListener)
 
 	queue := kernel.NewQueueList()
 	application = kernel.NewApp(
 		appMetadata,
 		localizerService,
 		queue,
-		kernel.NewQueueLayoutObject(queue, localizerService, layoutLocalizerListener),
+		kernel.NewQueueLayoutObject(queue, localizerService),
 		convertorService,
 	)
 }
@@ -101,9 +99,7 @@ func main() {
 
 	localizerRepository := localizer.NewRepository(settingRepository)
 	menuView := menu.NewView(application)
-	localizerListener := handler.NewLocalizerListener()
-	application.GetLocalizerService().AddListener(localizerListener)
-	mainMenu := handler.NewMenuHandler(application, convertorHandler, menuView, localizerView, localizerRepository, localizerListener)
+	mainMenu := handler.NewMenuHandler(application, convertorHandler, menuView, localizerView, localizerRepository)
 
 	mainHandler := handler.NewMainHandler(application, convertorHandler, mainMenu, localizerRepository)
 	mainHandler.Start()
