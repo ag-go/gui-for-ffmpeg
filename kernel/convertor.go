@@ -201,6 +201,7 @@ func (s Convertor) ChangeFFprobePath(path string) (bool, error) {
 func (s Convertor) GetSupportFormats() (encoder.ConvertorFormatsContract, error) {
 	formats := encoder.NewConvertorFormats()
 	cmd := exec.Command(s.ffPathUtilities.FFmpeg, "-encoders")
+	helper.PrepareBackgroundCommand(cmd)
 
 	stdOut, err := cmd.StdoutPipe()
 	if err != nil {
