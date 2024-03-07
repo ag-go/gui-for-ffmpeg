@@ -26,7 +26,7 @@ func init() {
 	appMetadata := &fyne.AppMetadata{
 		ID:      "net.kor-elf.projects.gui-for-ffmpeg",
 		Name:    "GUI for FFmpeg",
-		Version: "0.4.0",
+		Version: "0.5.0",
 		Icon:    iconResource,
 	}
 
@@ -95,7 +95,7 @@ func main() {
 
 	localizerView := localizer.NewView(application)
 	convertorView := convertor.NewView(application)
-	convertorHandler := handler.NewConvertorHandler(application, convertorView, convertorRepository)
+	convertorHandler := handler.NewConvertorHandler(application, convertorView, errorView, convertorRepository)
 
 	localizerRepository := localizer.NewRepository(settingRepository)
 	menuView := menu.NewView(application)

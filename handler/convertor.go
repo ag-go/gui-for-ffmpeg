@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"git.kor-elf.net/kor-elf/gui-for-ffmpeg/convertor"
+	error2 "git.kor-elf.net/kor-elf/gui-for-ffmpeg/error"
 	"git.kor-elf.net/kor-elf/gui-for-ffmpeg/helper"
 	"git.kor-elf.net/kor-elf/gui-for-ffmpeg/kernel"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
@@ -18,24 +19,32 @@ type ConvertorHandlerContract interface {
 type ConvertorHandler struct {
 	app                 kernel.AppContract
 	convertorView       convertor.ViewContract
+	errorView           error2.ViewContract
 	convertorRepository convertor.RepositoryContract
 }
 
 func NewConvertorHandler(
 	app kernel.AppContract,
 	convertorView convertor.ViewContract,
+	errorView error2.ViewContract,
 	convertorRepository convertor.RepositoryContract,
 ) *ConvertorHandler {
 	return &ConvertorHandler{
 		app:                 app,
 		convertorView:       convertorView,
+		errorView:           errorView,
 		convertorRepository: convertorRepository,
 	}
 }
 
 func (h ConvertorHandler) MainConvertor() {
 	if h.checkingFFPathUtilities() == true {
-		h.convertorView.Main(h.runConvert)
+		formats, err := h.app.GetConvertorService().GetSupportFormats()
+		if err != nil {
+			h.errorView.PanicError(err)
+			return
+		}
+		h.convertorView.Main(h.runConvert, formats)
 		return
 	}
 	h.convertorView.SelectFFPath("", "", h.saveSettingFFPath, nil, h.downloadFFmpeg)
@@ -59,11 +68,12 @@ func (h ConvertorHandler) runConvert(setting convertor.HandleConvertSetting) {
 	h.app.GetQueue().Add(&kernel.ConvertSetting{
 		VideoFileInput: setting.VideoFileInput,
 		VideoFileOut: kernel.File{
-			Path: setting.DirectoryForSave + helper.PathSeparator() + setting.VideoFileInput.Name + ".mp4",
+			Path: setting.DirectoryForSave + helper.PathSeparator() + setting.VideoFileInput.Name + "." + setting.Format,
 			Name: setting.VideoFileInput.Name,
-			Ext:  ".mp4",
+			Ext:  "." + setting.Format,
 		},
 		OverwriteOutputFiles: setting.OverwriteOutputFiles,
+		Encoder:              setting.Encoder,
 	})
 }
 

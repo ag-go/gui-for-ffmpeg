@@ -7,7 +7,9 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/widget"
+	encoder2 "git.kor-elf.net/kor-elf/gui-for-ffmpeg/encoder"
 	"git.kor-elf.net/kor-elf/gui-for-ffmpeg/kernel"
+	"git.kor-elf.net/kor-elf/gui-for-ffmpeg/kernel/encoder"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"image/color"
 	"path/filepath"
@@ -16,6 +18,7 @@ import (
 type ViewContract interface {
 	Main(
 		runConvert func(setting HandleConvertSetting),
+		formats encoder.ConvertorFormatsContract,
 	)
 	SelectFFPath(
 		ffmpegPath string,
@@ -34,6 +37,8 @@ type HandleConvertSetting struct {
 	VideoFileInput       kernel.File
 	DirectoryForSave     string
 	OverwriteOutputFiles bool
+	Format               string
+	Encoder              encoder2.EncoderContract
 }
 
 type enableFormConversionStruct struct {
@@ -50,6 +55,7 @@ func NewView(app kernel.AppContract) *View {
 
 func (v View) Main(
 	runConvert func(setting HandleConvertSetting),
+	formats encoder.ConvertorFormatsContract,
 ) {
 	form := &widget.Form{}
 
@@ -68,9 +74,11 @@ func (v View) Main(
 		isOverwriteOutputFiles = b
 	})
 
+	selectEncoder := v.getSelectFormat(formats)
+
 	form.Items = []*widget.FormItem{
 		{
-			Text:   v.app.GetLocalizerService().GetMessage(&i18n.LocalizeConfig{MessageID: "fileVideoForConversionTitle"}),
+			Text:   v.app.GetLocalizerService().GetMessage(&i18n.LocalizeConfig{MessageID: "fileForConversionTitle"}),
 			Widget: fileVideoForConversion,
 		},
 		{
@@ -85,6 +93,17 @@ func (v View) Main(
 		},
 		{
 			Widget: checkboxOverwriteOutputFiles,
+		},
+		{
+			Widget: selectEncoder.SelectFileType,
+		},
+		{
+			Text:   v.app.GetLocalizerService().GetMessage(&i18n.LocalizeConfig{MessageID: "selectFormat"}),
+			Widget: selectEncoder.SelectFormat,
+		},
+		{
+			Text:   v.app.GetLocalizerService().GetMessage(&i18n.LocalizeConfig{MessageID: "selectEncoder"}),
+			Widget: selectEncoder.SelectEncoder,
 		},
 	}
 	form.SubmitText = v.app.GetLocalizerService().GetMessage(&i18n.LocalizeConfig{
@@ -105,6 +124,18 @@ func (v View) Main(
 			enableFormConversion(enableFormConversionStruct)
 			return
 		}
+		if len(selectEncoder.SelectFormat.Selected) == 0 {
+			showConversionMessage(conversionMessage, errors.New(v.app.GetLocalizerService().GetMessage(&i18n.LocalizeConfig{
+				MessageID: "errorSelectedFormat",
+			})))
+			return
+		}
+		if selectEncoder.Encoder == nil {
+			showConversionMessage(conversionMessage, errors.New(v.app.GetLocalizerService().GetMessage(&i18n.LocalizeConfig{
+				MessageID: "errorSelectedEncoder",
+			})))
+			return
+		}
 		conversionMessage.Text = ""
 
 		fileVideoForConversion.Disable()
@@ -115,6 +146,8 @@ func (v View) Main(
 			VideoFileInput:       *fileInput,
 			DirectoryForSave:     *pathToSaveDirectory,
 			OverwriteOutputFiles: isOverwriteOutputFiles,
+			Format:               selectEncoder.SelectFormat.Selected,
+			Encoder:              selectEncoder.Encoder,
 		}
 		runConvert(setting)
 		enableFormConversion(enableFormConversionStruct)
@@ -207,6 +240,68 @@ func (v View) getButtonForSelectingDirectoryForSaving() (button *widget.Button, 
 	})
 
 	return
+}
+
+type selectEncoder struct {
+	SelectFileType *widget.RadioGroup
+	SelectFormat   *widget.Select
+	SelectEncoder  *widget.Select
+	Encoder        encoder2.EncoderContract
+}
+
+func (v View) getSelectFormat(formats encoder.ConvertorFormatsContract) *selectEncoder {
+	selectEncoder := &selectEncoder{}
+
+	encoders := map[int]encoder2.EncoderDataContract{}
+	selectEncoder.SelectEncoder = widget.NewSelect([]string{}, func(s string) {
+		if encoders[selectEncoder.SelectEncoder.SelectedIndex()] == nil {
+			return
+		}
+		selectEncoder.Encoder = encoders[selectEncoder.SelectEncoder.SelectedIndex()].NewEncoder()
+	})
+
+	formatSelected := ""
+	selectEncoder.SelectFormat = widget.NewSelect([]string{}, func(s string) {
+		if formatSelected == s {
+			return
+		}
+		formatSelected = s
+		format, err := formats.GetFormat(s)
+		if err != nil {
+			return
+		}
+		encoderOptions := []string{}
+		encoders = format.GetEncoders()
+		for _, e := range encoders {
+			encoderOptions = append(encoderOptions, v.app.GetLocalizerService().GetMessage(&i18n.LocalizeConfig{MessageID: "encoder_" + e.GetTitle()}))
+		}
+		selectEncoder.SelectEncoder.SetOptions(encoderOptions)
+		selectEncoder.SelectEncoder.SetSelectedIndex(0)
+	})
+
+	fileTypeOptions := []string{}
+	for _, fileType := range encoder2.GetListFileType() {
+		fileTypeOptions = append(fileTypeOptions, fileType.Name())
+	}
+	selectEncoder.SelectFileType = widget.NewRadioGroup([]string{"video", "audio", "image"}, func(s string) {
+		formatOptions := []string{}
+		for _, f := range formats.GetFormats() {
+			if s != f.GetFileType().Name() {
+				continue
+			}
+			formatOptions = append(formatOptions, f.GetTitle())
+		}
+		selectEncoder.SelectFormat.SetOptions(formatOptions)
+		if s == encoder2.FileType(encoder2.Video).Name() {
+			selectEncoder.SelectFormat.SetSelected("mp4")
+		} else {
+			selectEncoder.SelectFormat.SetSelectedIndex(0)
+		}
+	})
+	selectEncoder.SelectFileType.Horizontal = true
+	selectEncoder.SelectFileType.SetSelected("video")
+
+	return selectEncoder
 }
 
 func setStringErrorStyle(text *canvas.Text) {

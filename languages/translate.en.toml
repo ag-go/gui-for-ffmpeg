@@ -1,15 +1,139 @@
-[completedQueue]
-hash = "sha1-398c7d4f7b0d522afb930769c0fbb1a9f4b61fbe"
-other = "Completed"
+[encoder_apng]
+hash = "sha1-1cbd9abfef96d5614a7e569161b41bd6ad87bbaf"
+other = "APNG image"
 
-[errorQueue]
-hash = "sha1-72aecd9ad85642d84d62dbbf3cf70953c5f696c7"
-other = "Error"
+[encoder_bmp]
+hash = "sha1-e0b9c16b016961a5abdc2217e8ffd1ba7ddebc40"
+other = "BMP image"
 
-[inProgressQueue]
-hash = "sha1-eff79c40e2100ae5fadf3a7d99336025edcca8b5"
-other = "In Progress"
+[encoder_flv]
+hash = "sha1-3602bbf1cc90e48254f81975c7879b5fc0c4d602"
+other = "FLV"
 
-[waitingQueue]
-hash = "sha1-307429dd84150877080c4bbff2b340d1e7dadff2"
-other = "Waiting"
+[encoder_gif]
+hash = "sha1-d092a779172291b5215aa095390a5b11659128a4"
+other = "GIF image"
+
+[encoder_h264_nvenc]
+hash = "sha1-169389f8c4a2518410159c363378ab5c978c32e5"
+other = "H.264 with NVIDIA support"
+
+[encoder_libmp3lame]
+hash = "sha1-cd2c8d6f246c8bc18554b7105cb50b78d3cb2b98"
+other = "libmp3lame MP3 (MPEG audio layer 3)"
+
+[encoder_libshine]
+hash = "sha1-891d56c85857e5d83ef5a1fe077c1f1540788f49"
+other = "libshine MP3 (MPEG audio layer 3)"
+
+[encoder_libtwolame]
+hash = "sha1-b2f53be810b74edc3c454ac75de7ddecfee322ca"
+other = "libtwolame MP2 (MPEG audio layer 2)"
+
+[encoder_libvpx]
+hash = "sha1-b85c923aecfb48de0e87e71b6a21bfc2c547c70e"
+other = "libvpx VP8 (codec vp8)"
+
+[encoder_libvpx-vp9]
+hash = "sha1-3106417bd89bee87daa691e87614caf78cb934fe"
+other = "libvpx VP9 (codec vp9)"
+
+[encoder_libwebp]
+hash = "sha1-1d590d47d46f7880246061fce0e0de6d743db39e"
+other = "libwebp WebP image"
+
+[encoder_libwebp_anim]
+hash = "sha1-f141a9c8f23d79c13d44c30d8f34e05b363771ad"
+other = "libwebp_anim WebP image"
+
+[encoder_libx264]
+hash = "sha1-6d764ac459c0bf3c819d76618418cdfbb7a749eb"
+other = "H.264 libx264"
+
+[encoder_libx265]
+hash = "sha1-55544c166b1e15fd71a58096518e528109599eea"
+other = "H.265 libx265"
+
+[encoder_libxvid]
+hash = "sha1-d4bed46d6cdd2bfa8fd1689801164a83ab10c3f5"
+other = "libxvidcore MPEG-4 part 2"
+
+[encoder_mjpeg]
+hash = "sha1-94ba63a322b493a04da65e566781fe1cf8bb0d50"
+other = "MJPEG (Motion JPEG)"
+
+[encoder_mp2]
+hash = "sha1-a9154b7203349e5d6fbfd67d1ea97715f54b2065"
+other = "MP2 (MPEG audio layer 2)"
+
+[encoder_mp2fixed]
+hash = "sha1-dd2ee670d8bc8a60a96a717ebd26f16b5748cf3f"
+other = "MP2 fixed point (MPEG audio layer 2)"
+
+[encoder_mpeg1video]
+hash = "sha1-30043660719a3cb19dab5c33450665a8a9cc1c01"
+other = "MPEG-1"
+
+[encoder_mpeg2video]
+hash = "sha1-ccb2dcd8510cfdc9d52e5258af1863e5f2c51e77"
+other = "MPEG-2"
+
+[encoder_mpeg4]
+hash = "sha1-67fe42f18421b2f6c90fcdc579f9199bfca4b182"
+other = "MPEG-4 part 2"
+
+[encoder_msmpeg4]
+hash = "sha1-313ee597e4f0d9bd63a2bc6ac1618f028aef76f4"
+other = "MPEG-4 part 2 Microsoft variant version 3"
+
+[encoder_msmpeg4v2]
+hash = "sha1-adc442ce88f2717693b2da3010a1937d77ee522f"
+other = "MPEG-4 part 2 Microsoft variant version 2"
+
+[encoder_msvideo1]
+hash = "sha1-00f43ac0dc162bca10e0d98d6b70c0c6a902f66f"
+other = "Microsoft Video-1"
+
+[encoder_png]
+hash = "sha1-6715d4b82f5d9dfe3e53e30b402ffa1a6fbf30a5"
+other = "PNG image"
+
+[encoder_qtrle]
+hash = "sha1-31bf155cffaf6842ebc54084e4337ca08fdd9848"
+other = "QuickTime Animation (RLE) video"
+
+[encoder_sgi]
+hash = "sha1-f4510e237f7fc3c02caa728f9e500f4b069f9c11"
+other = "SGI image"
+
+[encoder_tiff]
+hash = "sha1-ed09d78c38e0b17ed695f35740c756dd7340eeac"
+other = "TIFF image"
+
+[encoder_wmav1]
+hash = "sha1-cd4a4c5eeac694b6699d55d0f9b477b3b50f18c7"
+other = "Windows Media Audio 1"
+
+[encoder_wmav2]
+hash = "sha1-eb2e5306cb33a702577ecfbdca0461862c66c053"
+other = "Windows Media Audio 2"
+
+[encoder_wmv1]
+hash = "sha1-f9b748554c590c36a56bcba2cd317196b7bdeddb"
+other = "Windows Media Video 7"
+
+[encoder_wmv2]
+hash = "sha1-5b21c87f5c6104797ead60b488b2948428f6b1b7"
+other = "Windows Media Video 8"
+
+[encoder_xbm]
+hash = "sha1-2dfc35881da62e9a1379d8238cf7839b24f79566"
+other = "XBM (X BitMap) image"
+
+[errorSelectedFormat]
+hash = "sha1-cda92c56a1ef1aabc92bbfc405ede8ab13087e66"
+other = "File extension not selected"
+
+[selectFormat]
+hash = "sha1-5e59b9376d321a49e73063eb7355b555d89bdd55"
+other = "Select file extension"
