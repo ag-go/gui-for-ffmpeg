@@ -19,7 +19,6 @@ type MenuHandler struct {
 	menuView            menu.ViewContract
 	localizerView       localizer.ViewContract
 	localizerRepository localizer.RepositoryContract
-	localizerListener   localizerListenerContract
 }
 
 func NewMenuHandler(
@@ -28,7 +27,6 @@ func NewMenuHandler(
 	menuView menu.ViewContract,
 	localizerView localizer.ViewContract,
 	localizerRepository localizer.RepositoryContract,
-	localizerListener localizerListenerContract,
 ) *MenuHandler {
 	return &MenuHandler{
 		app:                 app,
@@ -36,7 +34,6 @@ func NewMenuHandler(
 		menuView:            menuView,
 		localizerView:       localizerView,
 		localizerRepository: localizerRepository,
-		localizerListener:   localizerListener,
 	}
 }
 
@@ -52,22 +49,31 @@ func (h MenuHandler) getMenuSettings() *fyne.Menu {
 		MessageID: "exit",
 	}), nil)
 	quit.IsQuit = true
-	h.localizerListener.AddMenuItem("exit", quit)
+	h.app.GetLocalizerService().AddChangeCallback("exit", func(text string) {
+		quit.Label = text
+	})
 
 	languageSelection := fyne.NewMenuItem(h.app.GetLocalizerService().GetMessage(&i18n.LocalizeConfig{
 		MessageID: "changeLanguage",
 	}), h.LanguageSelection)
-	h.localizerListener.AddMenuItem("changeLanguage", languageSelection)
+	h.app.GetLocalizerService().AddChangeCallback("changeLanguage", func(text string) {
+		languageSelection.Label = text
+	})
 
 	ffPathSelection := fyne.NewMenuItem(h.app.GetLocalizerService().GetMessage(&i18n.LocalizeConfig{
 		MessageID: "changeFFPath",
 	}), h.convertorHandler.FfPathSelection)
-	h.localizerListener.AddMenuItem("changeFFPath", ffPathSelection)
+	h.app.GetLocalizerService().AddChangeCallback("changeFFPath", func(text string) {
+		ffPathSelection.Label = text
+	})
 
 	settings := fyne.NewMenu(h.app.GetLocalizerService().GetMessage(&i18n.LocalizeConfig{
 		MessageID: "settings",
 	}), languageSelection, ffPathSelection, quit)
-	h.localizerListener.AddMenu("settings", settings)
+	h.app.GetLocalizerService().AddChangeCallback("settings", func(text string) {
+		settings.Label = text
+		settings.Refresh()
+	})
 
 	return settings
 }
@@ -76,12 +82,17 @@ func (h MenuHandler) getMenuHelp() *fyne.Menu {
 	about := fyne.NewMenuItem(h.app.GetLocalizerService().GetMessage(&i18n.LocalizeConfig{
 		MessageID: "about",
 	}), h.openAbout)
-	h.localizerListener.AddMenuItem("about", about)
+	h.app.GetLocalizerService().AddChangeCallback("about", func(text string) {
+		about.Label = text
+	})
 
 	help := fyne.NewMenu(h.app.GetLocalizerService().GetMessage(&i18n.LocalizeConfig{
 		MessageID: "help",
 	}), about)
-	h.localizerListener.AddMenu("help", help)
+	h.app.GetLocalizerService().AddChangeCallback("help", func(text string) {
+		help.Label = text
+		help.Refresh()
+	})
 
 	return help
 }
@@ -108,42 +119,4 @@ func (h MenuHandler) LanguageSelection() {
 		_, _ = h.localizerRepository.Save(lang.Code)
 		h.convertorHandler.MainConvertor()
 	})
-}
-
-type menuItems struct {
-	menuItem map[string]*fyne.MenuItem
-	menu     map[string]*fyne.Menu
-}
-
-type LocalizerListener struct {
-	menuItems *menuItems
-}
-
-type localizerListenerContract interface {
-	AddMenu(messageID string, menu *fyne.Menu)
-	AddMenuItem(messageID string, menuItem *fyne.MenuItem)
-}
-
-func NewLocalizerListener() *LocalizerListener {
-	return &LocalizerListener{
-		&menuItems{menuItem: map[string]*fyne.MenuItem{}, menu: map[string]*fyne.Menu{}},
-	}
-}
-
-func (l LocalizerListener) AddMenu(messageID string, menu *fyne.Menu) {
-	l.menuItems.menu[messageID] = menu
-}
-
-func (l LocalizerListener) AddMenuItem(messageID string, menuItem *fyne.MenuItem) {
-	l.menuItems.menuItem[messageID] = menuItem
-}
-
-func (l LocalizerListener) Change(localizerService kernel.LocalizerContract) {
-	for messageID, menu := range l.menuItems.menuItem {
-		menu.Label = localizerService.GetMessage(&i18n.LocalizeConfig{MessageID: messageID})
-	}
-	for messageID, menu := range l.menuItems.menu {
-		menu.Label = localizerService.GetMessage(&i18n.LocalizeConfig{MessageID: messageID})
-		menu.Refresh()
-	}
 }

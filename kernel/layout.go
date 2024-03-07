@@ -61,11 +61,11 @@ type QueueLayoutObjectContract interface {
 type QueueLayoutObject struct {
 	QueueListContract QueueListContract
 
-	queue                   QueueListContract
-	container               *fyne.Container
-	items                   map[int]QueueLayoutItem
-	localizerService        LocalizerContract
-	layoutLocalizerListener LayoutLocalizerListenerContract
+	queue                 QueueListContract
+	container             *fyne.Container
+	items                 map[int]QueueLayoutItem
+	localizerService      LocalizerContract
+	queueStatisticsFormat *queueStatisticsFormat
 }
 
 type QueueLayoutItem struct {
@@ -73,20 +73,31 @@ type QueueLayoutItem struct {
 	ProgressBar   *widget.ProgressBar
 	StatusMessage *canvas.Text
 	MessageError  *canvas.Text
+
+	status *StatusContract
 }
 
-func NewQueueLayoutObject(queue QueueListContract, localizerService LocalizerContract, layoutLocalizerListener LayoutLocalizerListenerContract) *QueueLayoutObject {
-	title := widget.NewLabel(localizerService.GetMessage(&i18n.LocalizeConfig{MessageID: "queue"}) + ":")
+func NewQueueLayoutObject(queue QueueListContract, localizerService LocalizerContract) *QueueLayoutObject {
+	title := widget.NewLabel(localizerService.GetMessage(&i18n.LocalizeConfig{MessageID: "queue"}))
 	title.TextStyle.Bold = true
 
-	layoutLocalizerListener.AddItem("queue", title)
+	localizerService.AddChangeCallback("queue", func(text string) {
+		title.Text = text
+		title.Refresh()
+	})
+
+	items := map[int]QueueLayoutItem{}
+	queueStatisticsFormat := newQueueStatisticsFormat(localizerService, &items)
 
 	queueLayoutObject := &QueueLayoutObject{
-		queue:                   queue,
-		container:               container.NewVBox(title),
-		items:                   map[int]QueueLayoutItem{},
-		localizerService:        localizerService,
-		layoutLocalizerListener: layoutLocalizerListener,
+		queue: queue,
+		container: container.NewVBox(
+			container.NewHBox(title, queueStatisticsFormat.completed.widget, queueStatisticsFormat.error.widget),
+			container.NewHBox(queueStatisticsFormat.inProgress.widget, queueStatisticsFormat.waiting.widget, queueStatisticsFormat.total.widget),
+		),
+		items:                 items,
+		localizerService:      localizerService,
+		queueStatisticsFormat: queueStatisticsFormat,
 	}
 
 	queue.AddListener(queueLayoutObject)
@@ -118,11 +129,18 @@ func (o QueueLayoutObject) Add(id int, queue *Queue) {
 		canvas.NewLine(theme.FocusColor()),
 		container.NewPadded(),
 	)
+
+	o.queueStatisticsFormat.addQueue()
+	if o.queueStatisticsFormat.isChecked(queue.Status) == false {
+		content.Hide()
+	}
+
 	o.items[id] = QueueLayoutItem{
 		CanvasObject:  content,
 		ProgressBar:   progressBar,
 		StatusMessage: statusMessage,
 		MessageError:  messageError,
+		status:        &queue.Status,
 	}
 	o.container.Add(content)
 }
@@ -130,6 +148,7 @@ func (o QueueLayoutObject) Add(id int, queue *Queue) {
 func (o QueueLayoutObject) Remove(id int) {
 	if item, ok := o.items[id]; ok {
 		o.container.Remove(item.CanvasObject)
+		o.queueStatisticsFormat.removeQueue(*item.status)
 		o.items[id] = QueueLayoutItem{}
 	}
 }
@@ -145,6 +164,12 @@ func (o QueueLayoutObject) ChangeQueueStatus(queueId int, queue *Queue) {
 			item.MessageError.Color = statusColor
 			item.MessageError.Refresh()
 		}
+		if o.queueStatisticsFormat.isChecked(queue.Status) == false && item.CanvasObject.Visible() == true {
+			item.CanvasObject.Hide()
+		} else if item.CanvasObject.Visible() == false {
+			item.CanvasObject.Show()
+		}
+		o.queueStatisticsFormat.changeQueue(queue.Status)
 	}
 }
 
@@ -161,7 +186,7 @@ func (o QueueLayoutObject) getStatusColor(status StatusContract) color.Color {
 }
 
 func (o QueueLayoutObject) getStatusTitle(status StatusContract) string {
-	return o.localizerService.GetMessage(&i18n.LocalizeConfig{MessageID: status.name()})
+	return o.localizerService.GetMessage(&i18n.LocalizeConfig{MessageID: status.Name() + "Queue"})
 }
 
 type Progress struct {
@@ -254,35 +279,256 @@ func (p Progress) Run(stdOut io.ReadCloser, stdErr io.ReadCloser) error {
 	return nil
 }
 
-type LayoutLocalizerItem struct {
-	messageID string
-	object    *widget.Label
+type queueStatistics struct {
+	widget *widget.Check
+	title  string
+	count  *int64
+}
+type queueStatisticsFormat struct {
+	waiting    *queueStatistics
+	inProgress *queueStatistics
+	completed  *queueStatistics
+	error      *queueStatistics
+	total      *queueStatistics
 }
 
-type LayoutLocalizerListener struct {
-	itemCurrentId int
-	items         map[int]*LayoutLocalizerItem
+func newQueueStatisticsFormat(localizerService LocalizerContract, queueItems *map[int]QueueLayoutItem) *queueStatisticsFormat {
+	checkWaiting := newQueueStatistics("waitingQueue", localizerService)
+	checkInProgress := newQueueStatistics("inProgressQueue", localizerService)
+	checkCompleted := newQueueStatistics("completedQueue", localizerService)
+	checkError := newQueueStatistics("errorQueue", localizerService)
+	checkTotal := newQueueStatistics("total", localizerService)
+
+	queueStatisticsFormat := &queueStatisticsFormat{
+		waiting:    checkWaiting,
+		inProgress: checkInProgress,
+		completed:  checkCompleted,
+		error:      checkError,
+		total:      checkTotal,
+	}
+
+	checkTotal.widget.OnChanged = func(b bool) {
+		if b == true {
+			queueStatisticsFormat.allCheckboxChecked()
+		} else {
+			queueStatisticsFormat.allUnCheckboxChecked()
+		}
+		queueStatisticsFormat.redrawingQueueItems(queueItems)
+	}
+
+	queueStatisticsFormat.waiting.widget.OnChanged = func(b bool) {
+		if b == true {
+			queueStatisticsFormat.checkboxChecked()
+		} else {
+			queueStatisticsFormat.unCheckboxChecked()
+		}
+		queueStatisticsFormat.redrawingQueueItems(queueItems)
+	}
+
+	queueStatisticsFormat.inProgress.widget.OnChanged = func(b bool) {
+		if b == true {
+			queueStatisticsFormat.checkboxChecked()
+		} else {
+			queueStatisticsFormat.unCheckboxChecked()
+		}
+		queueStatisticsFormat.redrawingQueueItems(queueItems)
+	}
+
+	queueStatisticsFormat.completed.widget.OnChanged = func(b bool) {
+		if b == true {
+			queueStatisticsFormat.checkboxChecked()
+		} else {
+			queueStatisticsFormat.unCheckboxChecked()
+		}
+		queueStatisticsFormat.redrawingQueueItems(queueItems)
+	}
+
+	queueStatisticsFormat.error.widget.OnChanged = func(b bool) {
+		if b == true {
+			queueStatisticsFormat.checkboxChecked()
+		} else {
+			queueStatisticsFormat.unCheckboxChecked()
+		}
+		queueStatisticsFormat.redrawingQueueItems(queueItems)
+	}
+
+	return queueStatisticsFormat
 }
 
-type LayoutLocalizerListenerContract interface {
-	AddItem(messageID string, object *widget.Label)
-}
-
-func NewLayoutLocalizerListener() *LayoutLocalizerListener {
-	return &LayoutLocalizerListener{
-		itemCurrentId: 0,
-		items:         map[int]*LayoutLocalizerItem{},
+func (f queueStatisticsFormat) redrawingQueueItems(queueItems *map[int]QueueLayoutItem) {
+	for _, item := range *queueItems {
+		if f.isChecked(*item.status) == true && item.CanvasObject.Visible() == false {
+			item.CanvasObject.Show()
+			continue
+		}
+		if f.isChecked(*item.status) == false && item.CanvasObject.Visible() == true {
+			item.CanvasObject.Hide()
+		}
 	}
 }
 
-func (l LayoutLocalizerListener) AddItem(messageID string, object *widget.Label) {
-	l.itemCurrentId += 1
-	l.items[l.itemCurrentId] = &LayoutLocalizerItem{messageID: messageID, object: object}
+func (f queueStatisticsFormat) isChecked(status StatusContract) bool {
+	if status == StatusType(InProgress) {
+		return f.inProgress.widget.Checked
+	}
+	if status == StatusType(Completed) {
+		return f.completed.widget.Checked
+	}
+	if status == StatusType(Error) {
+		return f.error.widget.Checked
+	}
+	if status == StatusType(Waiting) {
+		return f.waiting.widget.Checked
+	}
+
+	return true
 }
 
-func (l LayoutLocalizerListener) Change(localizerService LocalizerContract) {
-	for _, item := range l.items {
-		item.object.Text = localizerService.GetMessage(&i18n.LocalizeConfig{MessageID: item.messageID})
-		item.object.Refresh()
+func (f queueStatisticsFormat) addQueue() {
+	f.waiting.add()
+	f.total.add()
+}
+
+func (f queueStatisticsFormat) changeQueue(status StatusContract) {
+	if status == StatusType(InProgress) {
+		f.waiting.remove()
+		f.inProgress.add()
+		return
+	}
+
+	if status == StatusType(Completed) {
+		f.inProgress.remove()
+		f.completed.add()
+		return
+	}
+
+	if status == StatusType(Error) {
+		f.inProgress.remove()
+		f.error.add()
+		return
+	}
+}
+
+func (f queueStatisticsFormat) removeQueue(status StatusContract) {
+	f.total.remove()
+
+	if status == StatusType(Completed) {
+		f.completed.remove()
+		return
+	}
+
+	if status == StatusType(Error) {
+		f.error.remove()
+		return
+	}
+
+	if status == StatusType(InProgress) {
+		f.inProgress.remove()
+		return
+	}
+
+	if status == StatusType(Waiting) {
+		f.waiting.remove()
+		return
+	}
+}
+
+func (f queueStatisticsFormat) checkboxChecked() {
+	if f.total.widget.Checked == true {
+		return
+	}
+
+	if f.waiting.widget.Checked == false {
+		return
+	}
+
+	if f.inProgress.widget.Checked == false {
+		return
+	}
+
+	if f.completed.widget.Checked == false {
+		return
+	}
+
+	if f.error.widget.Checked == false {
+		return
+	}
+
+	f.total.widget.Checked = true
+	f.total.widget.Refresh()
+}
+
+func (f queueStatisticsFormat) unCheckboxChecked() {
+	if f.total.widget.Checked == false {
+		return
+	}
+
+	f.total.widget.Checked = false
+	f.total.widget.Refresh()
+}
+
+func (f queueStatisticsFormat) allCheckboxChecked() {
+	f.waiting.widget.Checked = true
+	f.waiting.widget.Refresh()
+	f.inProgress.widget.Checked = true
+	f.inProgress.widget.Refresh()
+	f.completed.widget.Checked = true
+	f.completed.widget.Refresh()
+	f.error.widget.Checked = true
+	f.error.widget.Refresh()
+}
+
+func (f queueStatisticsFormat) allUnCheckboxChecked() {
+	f.waiting.widget.Checked = false
+	f.waiting.widget.Refresh()
+	f.inProgress.widget.Checked = false
+	f.inProgress.widget.Refresh()
+	f.completed.widget.Checked = false
+	f.completed.widget.Refresh()
+	f.error.widget.Checked = false
+	f.error.widget.Refresh()
+}
+
+func newQueueStatistics(messaigeID string, localizerService LocalizerContract) *queueStatistics {
+	checkbox := widget.NewCheck("", nil)
+	checkbox.Checked = true
+
+	count := int64(0)
+
+	title := localizerService.GetMessage(&i18n.LocalizeConfig{MessageID: messaigeID})
+	queueStatistics := &queueStatistics{
+		widget: checkbox,
+		title:  strings.ToLower(title),
+		count:  &count,
+	}
+
+	queueStatistics.formatText(false)
+
+	localizerService.AddChangeCallback(messaigeID, func(text string) {
+		queueStatistics.title = strings.ToLower(text)
+		queueStatistics.formatText(true)
+		queueStatistics.widget.Refresh()
+	})
+
+	return queueStatistics
+}
+
+func (s queueStatistics) add() {
+	*s.count += 1
+	s.formatText(true)
+}
+
+func (s queueStatistics) remove() {
+	if *s.count == 0 {
+		return
+	}
+	*s.count -= 1
+	s.formatText(true)
+}
+
+func (s queueStatistics) formatText(refresh bool) {
+	s.widget.Text = s.title + ": " + strconv.FormatInt(*s.count, 10)
+	if refresh == true {
+		s.widget.Refresh()
 	}
 }

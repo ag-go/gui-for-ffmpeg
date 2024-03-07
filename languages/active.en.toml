@@ -38,7 +38,7 @@ other = "Allow file to be overwritten"
 hash = "sha1-f60bb5f761024d973834b5e9d25ceebce2c85f94"
 other = "choose"
 
-[completed]
+[completedQueue]
 hash = "sha1-398c7d4f7b0d522afb930769c0fbb1a9f4b61fbe"
 other = "Completed"
 
@@ -47,8 +47,8 @@ hash = "sha1-7ac460f3c24c9952082f2db6e4d62f752598709c"
 other = "Convert"
 
 [converterVideoFilesTitle]
-hash = "sha1-4d972809e4c7f9c9ff2c110a126bbc183c9429ce"
-other = "Converter video files to mp4"
+hash = "sha1-1ab29597cc9dfefab08e54ea5442e7ffa15f0394"
+other = "Video, audio and picture converter"
 
 [download]
 hash = "sha1-fe8f79f29da457de2f6bc9531de6e536e0c426ad"
@@ -61,6 +61,138 @@ other = "Will be downloaded from the site:"
 [downloadRun]
 hash = "sha1-55f87f114628fa2d5d8e67d1e1cda22c0e4f9271"
 other = "Downloading..."
+
+[encoder_apng]
+hash = "sha1-1cbd9abfef96d5614a7e569161b41bd6ad87bbaf"
+other = "APNG image"
+
+[encoder_bmp]
+hash = "sha1-e0b9c16b016961a5abdc2217e8ffd1ba7ddebc40"
+other = "BMP image"
+
+[encoder_flv]
+hash = "sha1-3602bbf1cc90e48254f81975c7879b5fc0c4d602"
+other = "FLV"
+
+[encoder_gif]
+hash = "sha1-d092a779172291b5215aa095390a5b11659128a4"
+other = "GIF image"
+
+[encoder_h264_nvenc]
+hash = "sha1-169389f8c4a2518410159c363378ab5c978c32e5"
+other = "H.264 with NVIDIA support"
+
+[encoder_libmp3lame]
+hash = "sha1-cd2c8d6f246c8bc18554b7105cb50b78d3cb2b98"
+other = "libmp3lame MP3 (MPEG audio layer 3)"
+
+[encoder_libshine]
+hash = "sha1-891d56c85857e5d83ef5a1fe077c1f1540788f49"
+other = "libshine MP3 (MPEG audio layer 3)"
+
+[encoder_libtwolame]
+hash = "sha1-b2f53be810b74edc3c454ac75de7ddecfee322ca"
+other = "libtwolame MP2 (MPEG audio layer 2)"
+
+[encoder_libvpx]
+hash = "sha1-b85c923aecfb48de0e87e71b6a21bfc2c547c70e"
+other = "libvpx VP8 (codec vp8)"
+
+[encoder_libvpx-vp9]
+hash = "sha1-3106417bd89bee87daa691e87614caf78cb934fe"
+other = "libvpx VP9 (codec vp9)"
+
+[encoder_libwebp]
+hash = "sha1-1d590d47d46f7880246061fce0e0de6d743db39e"
+other = "libwebp WebP image"
+
+[encoder_libwebp_anim]
+hash = "sha1-f141a9c8f23d79c13d44c30d8f34e05b363771ad"
+other = "libwebp_anim WebP image"
+
+[encoder_libx264]
+hash = "sha1-6d764ac459c0bf3c819d76618418cdfbb7a749eb"
+other = "H.264 libx264"
+
+[encoder_libx265]
+hash = "sha1-55544c166b1e15fd71a58096518e528109599eea"
+other = "H.265 libx265"
+
+[encoder_libxvid]
+hash = "sha1-d4bed46d6cdd2bfa8fd1689801164a83ab10c3f5"
+other = "libxvidcore MPEG-4 part 2"
+
+[encoder_mjpeg]
+hash = "sha1-94ba63a322b493a04da65e566781fe1cf8bb0d50"
+other = "MJPEG (Motion JPEG)"
+
+[encoder_mp2]
+hash = "sha1-a9154b7203349e5d6fbfd67d1ea97715f54b2065"
+other = "MP2 (MPEG audio layer 2)"
+
+[encoder_mp2fixed]
+hash = "sha1-dd2ee670d8bc8a60a96a717ebd26f16b5748cf3f"
+other = "MP2 fixed point (MPEG audio layer 2)"
+
+[encoder_mpeg1video]
+hash = "sha1-30043660719a3cb19dab5c33450665a8a9cc1c01"
+other = "MPEG-1"
+
+[encoder_mpeg2video]
+hash = "sha1-ccb2dcd8510cfdc9d52e5258af1863e5f2c51e77"
+other = "MPEG-2"
+
+[encoder_mpeg4]
+hash = "sha1-67fe42f18421b2f6c90fcdc579f9199bfca4b182"
+other = "MPEG-4 part 2"
+
+[encoder_msmpeg4]
+hash = "sha1-313ee597e4f0d9bd63a2bc6ac1618f028aef76f4"
+other = "MPEG-4 part 2 Microsoft variant version 3"
+
+[encoder_msmpeg4v2]
+hash = "sha1-adc442ce88f2717693b2da3010a1937d77ee522f"
+other = "MPEG-4 part 2 Microsoft variant version 2"
+
+[encoder_msvideo1]
+hash = "sha1-00f43ac0dc162bca10e0d98d6b70c0c6a902f66f"
+other = "Microsoft Video-1"
+
+[encoder_png]
+hash = "sha1-6715d4b82f5d9dfe3e53e30b402ffa1a6fbf30a5"
+other = "PNG image"
+
+[encoder_qtrle]
+hash = "sha1-31bf155cffaf6842ebc54084e4337ca08fdd9848"
+other = "QuickTime Animation (RLE) video"
+
+[encoder_sgi]
+hash = "sha1-f4510e237f7fc3c02caa728f9e500f4b069f9c11"
+other = "SGI image"
+
+[encoder_tiff]
+hash = "sha1-ed09d78c38e0b17ed695f35740c756dd7340eeac"
+other = "TIFF image"
+
+[encoder_wmav1]
+hash = "sha1-cd4a4c5eeac694b6699d55d0f9b477b3b50f18c7"
+other = "Windows Media Audio 1"
+
+[encoder_wmav2]
+hash = "sha1-eb2e5306cb33a702577ecfbdca0461862c66c053"
+other = "Windows Media Audio 2"
+
+[encoder_wmv1]
+hash = "sha1-f9b748554c590c36a56bcba2cd317196b7bdeddb"
+other = "Windows Media Video 7"
+
+[encoder_wmv2]
+hash = "sha1-5b21c87f5c6104797ead60b488b2948428f6b1b7"
+other = "Windows Media Video 8"
+
+[encoder_xbm]
+hash = "sha1-2dfc35881da62e9a1379d8238cf7839b24f79566"
+other = "XBM (X BitMap) image"
 
 [error]
 hash = "sha1-a7df8f8b5d754f226ac4cb320577fe692b33e483"
@@ -90,9 +222,21 @@ other = "this is not FFprobe"
 hash = "sha1-da7b37d7df3fafbd153665b13888413d52b24c17"
 other = "Failed to determine FFprobe version"
 
+[errorQueue]
+hash = "sha1-72aecd9ad85642d84d62dbbf3cf70953c5f696c7"
+other = "Error"
+
+[errorSelectedEncoder]
+hash = "sha1-33ed1aaf4cb3c2ee9d8f8c325b9b75d16ddf9979"
+other = "Converter not selected"
+
 [errorSelectedFolderSave]
-hash = "sha1-83da899677cdc90e4344e3b94ee03c46b51bee4c"
-other = "You haven't selected a folder to save!"
+hash = "sha1-16f3ef93ee36813fdd79d8fb9bb7fc02acbb94a8"
+other = "No save folder selected!"
+
+[errorSelectedFormat]
+hash = "sha1-cda92c56a1ef1aabc92bbfc405ede8ab13087e66"
+other = "File extension not selected"
 
 [exit]
 hash = "sha1-c42457057d1ab7950cea00719cbe0b078891775f"
@@ -106,15 +250,15 @@ other = "This software uses libraries from the **FFmpeg** project under the **[L
 hash = "sha1-45f772b2eca5098cd6d31f2d1dc6edec1987a617"
 other = "**FFmpeg** is a trademark of **[Fabrice Bellard](http://bellard.org/)**, originator of the **[FFmpeg](https://ffmpeg.org/about.html)** project."
 
-[fileVideoForConversionTitle]
-hash = "sha1-5e727d4a2ff3f21080e51e81641595b2e668f3be"
-other = "File for conversion:"
+[fileForConversionTitle]
+hash = "sha1-981bf090072a487e538d00780d337b47ca877372"
+other = "File to convert:"
 
 [help]
 hash = "sha1-6a45cef900c668effcb2ab10da05855c1fd10f6f"
 other = "Help"
 
-[inProgress]
+[inProgressQueue]
 hash = "sha1-eff79c40e2100ae5fadf3a7d99336025edcca8b5"
 other = "In Progress"
 
@@ -158,9 +302,17 @@ other = "Queue"
 hash = "sha1-4864057d626a868fa60f999bed3191d61d045ddc"
 other = "Save"
 
+[selectEncoder]
+hash = "sha1-07beb734a090830bedf8e038e3b45c73d64b5696"
+other = "Select a converter"
+
 [selectFFPathTitle]
 hash = "sha1-95581446a28d968ff1a027c623159a7eb08654cf"
 other = "Specify the path to FFmpeg and FFprobe"
+
+[selectFormat]
+hash = "sha1-5e59b9376d321a49e73063eb7355b555d89bdd55"
+other = "Select file extension"
 
 [settings]
 hash = "sha1-7f17c7c62a7fd8d1a508481f4778688927734c2f"
@@ -174,10 +326,14 @@ other = "Checking FFmpeg for serviceability..."
 hash = "sha1-92df86371f6c3a06ca1e4754f113142776a32d49"
 other = "You can download it from here"
 
+[total]
+hash = "sha1-3b5143902e0c5c84459aedf918e17604d9735b94"
+other = "Total"
+
 [unzipRun]
 hash = "sha1-c554dad13026668a1f6adf3171837c5d51bbac36"
 other = "Unpacked..."
 
-[waiting]
+[waitingQueue]
 hash = "sha1-307429dd84150877080c4bbff2b340d1e7dadff2"
 other = "Waiting"

@@ -10,21 +10,9 @@ type Queue struct {
 	Error   error
 }
 
-type File struct {
-	Path string
-	Name string
-	Ext  string
-}
-
-type ConvertSetting struct {
-	VideoFileInput       File
-	VideoFileOut         File
-	OverwriteOutputFiles bool
-}
-
 type StatusContract interface {
-	name() string
-	ordinal() int
+	Name() string
+	Ordinal() int
 }
 
 const (
@@ -43,11 +31,11 @@ var statusTypeStrings = []string{
 	"error",
 }
 
-func (status StatusType) name() string {
+func (status StatusType) Name() string {
 	return statusTypeStrings[status]
 }
 
-func (status StatusType) ordinal() int {
+func (status StatusType) Ordinal() int {
 	return int(status)
 }
 
