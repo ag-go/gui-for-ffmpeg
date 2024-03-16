@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"git.kor-elf.net/kor-elf/gui-for-ffmpeg/convertor"
+	"git.kor-elf.net/kor-elf/gui-for-ffmpeg/convertor/view"
 	error2 "git.kor-elf.net/kor-elf/gui-for-ffmpeg/error"
 	"git.kor-elf.net/kor-elf/gui-for-ffmpeg/helper"
 	"git.kor-elf.net/kor-elf/gui-for-ffmpeg/kernel"
@@ -44,7 +45,8 @@ func (h ConvertorHandler) MainConvertor() {
 			h.errorView.PanicError(err)
 			return
 		}
-		h.convertorView.Main(h.runConvert, formats)
+		conversion := view.NewConversion(h.app, formats, h.runConvert)
+		h.convertorView.Main(conversion)
 		return
 	}
 	h.convertorView.SelectFFPath("", "", h.saveSettingFFPath, nil, h.downloadFFmpeg)
@@ -64,12 +66,12 @@ func (h ConvertorHandler) GetFfprobeVersion() (string, error) {
 	return h.app.GetConvertorService().GetFFprobeVersion()
 }
 
-func (h ConvertorHandler) runConvert(setting convertor.HandleConvertSetting) {
+func (h ConvertorHandler) runConvert(setting view.HandleConvertSetting) {
 	h.app.GetQueue().Add(&kernel.ConvertSetting{
-		VideoFileInput: setting.VideoFileInput,
+		VideoFileInput: setting.FileInput,
 		VideoFileOut: kernel.File{
-			Path: setting.DirectoryForSave + helper.PathSeparator() + setting.VideoFileInput.Name + "." + setting.Format,
-			Name: setting.VideoFileInput.Name,
+			Path: setting.DirectoryForSave + helper.PathSeparator() + setting.FileInput.Name + "." + setting.Format,
+			Name: setting.FileInput.Name,
 			Ext:  "." + setting.Format,
 		},
 		OverwriteOutputFiles: setting.OverwriteOutputFiles,

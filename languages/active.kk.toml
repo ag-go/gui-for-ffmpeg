@@ -15,8 +15,8 @@ hash = "sha1-c223c2e15171156192bc3146aee91e6094bb475b"
 other = "FFmpeg автоматты түрде жүктеп алыңыз"
 
 [buttonForSelectedDirTitle]
-hash = "sha1-52b13f1b13e82d22e8c4102332db5d4ec551247b"
-other = "Файлды сақтауға арналған каталог:"
+hash = "sha1-8cbe5c67bcf89e4624635a79cbea104227faedda"
+other = "Қалтаға сақтаңыз:"
 
 [cancel]
 hash = "sha1-0ec753be8df955a117404fb634b01b45eb386e2a"
@@ -61,6 +61,18 @@ other = "Сайттан жүктеледі:"
 [downloadRun]
 hash = "sha1-55f87f114628fa2d5d8e67d1e1cda22c0e4f9271"
 other = "Жүктеп алынуда..."
+
+[encoderGroupAudio]
+hash = "sha1-24321cb5400df96be8f3e2131918bebdb3a01bba"
+other = "Аудио"
+
+[encoderGroupImage]
+hash = "sha1-a7e528bc7ac9538aec87d1593c38b80be95d4745"
+other = "Суреттер"
+
+[encoderGroupVideo]
+hash = "sha1-8e7b9894c7ef0f57ac0bf910f6a8aac1c8a53683"
+other = "Бейне"
 
 [encoder_apng]
 hash = "sha1-1cbd9abfef96d5614a7e569161b41bd6ad87bbaf"
@@ -251,8 +263,8 @@ hash = "sha1-45f772b2eca5098cd6d31f2d1dc6edec1987a617"
 other = "FFmpeg — **[FFmpeg](https://ffmpeg.org/about.html)** жобасын жасаушы **[Fabrice Bellard](http://bellard.org/)** сауда белгісі."
 
 [fileForConversionTitle]
-hash = "sha1-981bf090072a487e538d00780d337b47ca877372"
-other = "Түрлендіруге арналған файл:"
+hash = "sha1-96ac799e1086b31fd8f5f8d4c801829d6c853f08"
+other = "Файл:"
 
 [help]
 hash = "sha1-6a45cef900c668effcb2ab10da05855c1fd10f6f"
@@ -303,16 +315,16 @@ hash = "sha1-4864057d626a868fa60f999bed3191d61d045ddc"
 other = "Сақтау"
 
 [selectEncoder]
-hash = "sha1-07beb734a090830bedf8e038e3b45c73d64b5696"
-other = "Түрлендіргішті таңдаңыз"
+hash = "sha1-db41d1c87b2fbe561bbdcc03919d3a55360bb7d8"
+other = "Түрлендіргіш:"
 
 [selectFFPathTitle]
 hash = "sha1-95581446a28d968ff1a027c623159a7eb08654cf"
 other = "FFmpeg және FFprobe жолын көрсетіңіз"
 
 [selectFormat]
-hash = "sha1-5e59b9376d321a49e73063eb7355b555d89bdd55"
-other = "Файл кеңейтімін таңдаңыз"
+hash = "sha1-f3809b0b48886570cd4cf1d7099de6da5b6d4524"
+other = "Файл кеңейтімі:"
 
 [settings]
 hash = "sha1-7f17c7c62a7fd8d1a508481f4778688927734c2f"
