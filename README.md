@@ -35,8 +35,11 @@
 
 ## Работа с переводами:
 1. go install -v github.com/nicksnyder/go-i18n/v2/goi18n@latest
-2. goi18n merge -sourceLanguage ru -outdir languages languages/active.\*.toml languages/translate.\*.toml
-3. В файлах **languages/translate.\*.toml** переводим текст на нужный язык
+3. Создаём файл languages/translate.\*.toml
 4. goi18n merge -sourceLanguage ru -outdir languages languages/active.\*.toml languages/translate.\*.toml
+5. В файлах **languages/translate.\*.toml** переводим текст на нужный язык
+6. goi18n merge -sourceLanguage ru -outdir languages languages/active.\*.toml languages/translate.\*.toml
+
+___где * подставляем нужный язык___
 
 Более подробно можно почитать тут: https://github.com/nicksnyder/go-i18n
