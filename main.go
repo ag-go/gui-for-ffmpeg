@@ -26,7 +26,7 @@ func init() {
 	appMetadata := &fyne.AppMetadata{
 		ID:      "net.kor-elf.projects.gui-for-ffmpeg",
 		Name:    "GUI for FFmpeg",
-		Version: "0.5.0",
+		Version: "0.6.0",
 		Icon:    iconResource,
 	}
 

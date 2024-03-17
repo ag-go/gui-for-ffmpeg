@@ -22,7 +22,8 @@ type Window struct {
 }
 
 func newWindow(w fyne.Window, layout LayoutContract) Window {
-	w.Resize(fyne.Size{Width: 1039, Height: 599})
+	windowSize := fyne.Size{Width: 1039, Height: 599}
+	w.Resize(windowSize)
 	w.CenterOnScreen()
 
 	go func() {
@@ -30,11 +31,10 @@ func newWindow(w fyne.Window, layout LayoutContract) Window {
 		 * Bug fixed.
 		 * When starting the program, sometimes the window was displayed incorrectly.
 		 */
+		windowSize.Width += 1
+		windowSize.Height += 1
 		time.Sleep(time.Millisecond * 500)
-		size := w.Canvas().Size()
-		size.Width += 1
-		size.Height += 1
-		w.Resize(size)
+		w.Resize(windowSize)
 	}()
 
 	return Window{
