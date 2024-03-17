@@ -7,6 +7,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/widget"
+	"git.kor-elf.net/kor-elf/gui-for-ffmpeg/convertor/view/form_items"
 	encoder2 "git.kor-elf.net/kor-elf/gui-for-ffmpeg/encoder"
 	"git.kor-elf.net/kor-elf/gui-for-ffmpeg/kernel"
 	"git.kor-elf.net/kor-elf/gui-for-ffmpeg/kernel/encoder"
@@ -22,7 +23,7 @@ type ConversionContract interface {
 
 type Conversion struct {
 	app                  kernel.AppContract
-	form                 *widget.Form
+	form                 *form
 	conversionMessage    *canvas.Text
 	fileForConversion    *fileForConversion
 	directoryForSaving   *directoryForSaving
@@ -49,8 +50,7 @@ func NewConversion(app kernel.AppContract, formats encoder.ConvertorFormatsContr
 	overwriteOutputFiles := newOverwriteOutputFiles(app)
 	selectEncoder := newSelectEncoder(app, formats)
 
-	form := widget.NewForm()
-	form.Items = []*widget.FormItem{
+	items := []*widget.FormItem{
 		{
 			Text:   app.GetLocalizerService().GetMessage(&i18n.LocalizeConfig{MessageID: "fileForConversionTitle"}),
 			Widget: fileForConversion.button,
@@ -80,9 +80,7 @@ func NewConversion(app kernel.AppContract, formats encoder.ConvertorFormatsContr
 			Widget: selectEncoder.SelectEncoder,
 		},
 	}
-	form.SubmitText = app.GetLocalizerService().GetMessage(&i18n.LocalizeConfig{
-		MessageID: "converterVideoFilesSubmitTitle",
-	})
+	form := newForm(app, items)
 
 	return &Conversion{
 		app:                  app,
@@ -97,27 +95,41 @@ func NewConversion(app kernel.AppContract, formats encoder.ConvertorFormatsContr
 }
 
 func (c Conversion) GetContent() fyne.CanvasObject {
-	c.form.OnSubmit = c.submit
+	c.form.form.OnSubmit = c.submit
 	c.fileForConversion.AddChangeCallback(c.selectFileForConversion)
+	c.selectEncoder.AddChangeCallback(c.changeEncoder)
+	if c.selectEncoder.Encoder != nil {
+		c.selectEncoder.SelectEncoder.SetSelectedIndex(c.selectEncoder.SelectEncoder.SelectedIndex())
+	}
 
 	return container.NewVBox(
-		c.form,
+		c.form.form,
 		c.conversionMessage,
 	)
 }
 
+func (c Conversion) changeEncoder(encoder encoder2.EncoderContract) {
+	items := []*widget.FormItem{}
+
+	if form_items.Views[encoder.GetName()] != nil {
+		items = form_items.Views[encoder.GetName()](encoder, c.app)
+	}
+
+	c.form.ChangeItems(items)
+}
+
 func (c Conversion) AfterViewContent() {
-	c.form.Disable()
+	c.form.form.Disable()
 }
 
 func (c Conversion) selectFileForConversion(err error) {
 	c.conversionMessage.Text = ""
 	if err != nil {
-		c.form.Disable()
+		c.form.form.Disable()
 		return
 	}
 
-	c.form.Enable()
+	c.form.form.Enable()
 }
 
 func (c Conversion) submit() {
@@ -144,7 +156,7 @@ func (c Conversion) submit() {
 
 	c.fileForConversion.button.Disable()
 	c.directoryForSaving.button.Disable()
-	c.form.Disable()
+	c.form.form.Disable()
 
 	setting := HandleConvertSetting{
 		FileInput:            *c.fileForConversion.file,
@@ -157,13 +169,13 @@ func (c Conversion) submit() {
 	c.enableFormConversion()
 
 	c.fileForConversion.message.Text = ""
-	c.form.Disable()
+	c.form.form.Disable()
 }
 
 func (c Conversion) enableFormConversion() {
 	c.fileForConversion.button.Enable()
 	c.directoryForSaving.button.Enable()
-	c.form.Enable()
+	c.form.form.Enable()
 }
 
 type fileForConversion struct {
@@ -301,17 +313,22 @@ type selectEncoder struct {
 	SelectFormat   *widget.Select
 	SelectEncoder  *widget.Select
 	Encoder        encoder2.EncoderContract
+
+	changeCallbacks map[int]func(encoder encoder2.EncoderContract)
 }
 
 func newSelectEncoder(app kernel.AppContract, formats encoder.ConvertorFormatsContract) *selectEncoder {
-	selectEncoder := &selectEncoder{}
+	selectEncoder := &selectEncoder{
+		changeCallbacks: map[int]func(encoder encoder2.EncoderContract){},
+	}
 
 	encoders := map[int]encoder2.EncoderDataContract{}
 	selectEncoder.SelectEncoder = widget.NewSelect([]string{}, func(s string) {
 		if encoders[selectEncoder.SelectEncoder.SelectedIndex()] == nil {
 			return
 		}
-		selectEncoder.Encoder = encoders[selectEncoder.SelectEncoder.SelectedIndex()].NewEncoder()
+		selectEncoderData := encoders[selectEncoder.SelectEncoder.SelectedIndex()]
+		selectEncoder.ChangeEncoder(selectEncoderData.NewEncoder())
 	})
 
 	formatSelected := ""
@@ -325,8 +342,9 @@ func newSelectEncoder(app kernel.AppContract, formats encoder.ConvertorFormatsCo
 			return
 		}
 		encoderOptions := []string{}
-		encoders = format.GetEncoders()
-		for _, e := range encoders {
+		encoders = map[int]encoder2.EncoderDataContract{}
+		for _, e := range format.GetEncoders() {
+			encoders[len(encoders)] = e
 			encoderOptions = append(encoderOptions, app.GetLocalizerService().GetMessage(&i18n.LocalizeConfig{MessageID: "encoder_" + e.GetTitle()}))
 		}
 		selectEncoder.SelectEncoder.SetOptions(encoderOptions)
@@ -364,9 +382,25 @@ func newSelectEncoder(app kernel.AppContract, formats encoder.ConvertorFormatsCo
 		}
 	})
 	selectEncoder.SelectFileType.Horizontal = true
+	selectEncoder.SelectFileType.Required = true
 	selectEncoder.SelectFileType.SetSelected(encoderGroupVideo)
 
 	return selectEncoder
+}
+
+func (e *selectEncoder) ChangeEncoder(encoder encoder2.EncoderContract) {
+	e.Encoder = encoder
+	e.eventSelectEncoder(e.Encoder)
+}
+
+func (e *selectEncoder) AddChangeCallback(callback func(encoder encoder2.EncoderContract)) {
+	e.changeCallbacks[len(e.changeCallbacks)] = callback
+}
+
+func (e *selectEncoder) eventSelectEncoder(encoder encoder2.EncoderContract) {
+	for _, changeCallback := range e.changeCallbacks {
+		changeCallback(encoder)
+	}
 }
 
 func setStringErrorStyle(text *canvas.Text) {
@@ -382,4 +416,29 @@ func setStringSuccessStyle(text *canvas.Text) {
 func showConversionMessage(conversionMessage *canvas.Text, err error) {
 	conversionMessage.Text = err.Error()
 	setStringErrorStyle(conversionMessage)
+}
+
+type form struct {
+	form  *widget.Form
+	items []*widget.FormItem
+}
+
+func newForm(app kernel.AppContract, items []*widget.FormItem) *form {
+	f := widget.NewForm()
+	f.SubmitText = app.GetLocalizerService().GetMessage(&i18n.LocalizeConfig{
+		MessageID: "converterVideoFilesSubmitTitle",
+	})
+	f.Items = items
+
+	return &form{
+		form:  f,
+		items: items,
+	}
+}
+
+func (f form) ChangeItems(items []*widget.FormItem) {
+	f.form.Items = f.items
+	f.form.Refresh()
+	f.form.Items = append(f.form.Items, items...)
+	f.form.Refresh()
 }

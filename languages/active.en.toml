@@ -266,6 +266,10 @@ other = "**FFmpeg** is a trademark of **[Fabrice Bellard](http://bellard.org/)**
 hash = "sha1-96ac799e1086b31fd8f5f8d4c801829d6c853f08"
 other = "File:"
 
+[formPreset]
+hash = "sha1-7759891ba1ef9f7adc70defc7ac18fbf149c1a68"
+other = "Preset"
+
 [help]
 hash = "sha1-6a45cef900c668effcb2ab10da05855c1fd10f6f"
 other = "Help"
@@ -290,6 +294,10 @@ other = "License information"
 hash = "sha1-359fff328717c05104e51a2d29f05bf1875d26b7"
 other = "Licenses from other products used in the program"
 
+[parameterCheckbox]
+hash = "sha1-9e35221d454870996fd51d576249cf47d1784a3c"
+other = "Enable option"
+
 [pathToFfmpeg]
 hash = "sha1-fafc50f1db0f720fe83a96cd70a9e1ad824e96b6"
 other = "Path to FFmpeg:"
@@ -297,6 +305,46 @@ other = "Path to FFmpeg:"
 [pathToFfprobe]
 hash = "sha1-b872edc9633a2e81ef678dc46fe46a7e91732024"
 other = "Path to FFprobe:"
+
+[preset_fast]
+hash = "sha1-935e1ac9d3c8ba4478326c909ba66662acb0540e"
+other = "fast (slower than \"faster\", but the file will weigh less)"
+
+[preset_faster]
+hash = "sha1-98620b73c896440c39ea6ec4b9b19d41301c9a7e"
+other = "faster (slower than \"veryfast\", but the file will weigh less)"
+
+[preset_medium]
+hash = "sha1-f7d1c30135c22c2f07c247075c0df103bb3c3ea5"
+other = "medium (slower than \"fast\", but the file will weigh less)"
+
+[preset_placebo]
+hash = "sha1-7bcff099104bb192881139e6404981bd426b3f91"
+other = "placebo (not recommended)"
+
+[preset_slow]
+hash = "sha1-681bf587275a45b48af49bb2ad8f0947919530e7"
+other = "slow (slower than \"medium\", but the file will weigh less)"
+
+[preset_slower]
+hash = "sha1-d1c692ee2b7643ae2c71a48bea880327a3c6b1e3"
+other = "slower (slower than \"slow\", but the file will weigh less)"
+
+[preset_superfast]
+hash = "sha1-41c39959e8f1547cc9259a5b459c4ccbf368cc23"
+other = "superfast (slower than \"ultrafast\", but the file will weigh less)"
+
+[preset_ultrafast]
+hash = "sha1-dfed981573ac2046832f9a9450bc9388958753fa"
+other = "ultrafast (fast, but the file will weigh a lot)"
+
+[preset_veryfast]
+hash = "sha1-370b82509887d02d7a2ef9b110df4616b16123ce"
+other = "veryfast (slower than \"superfast\", but the file will weigh less)"
+
+[preset_veryslow]
+hash = "sha1-d428bfa6deea9dd5c7c1f80ceba24e123ae96d0d"
+other = "veryslow (slower than \"slower\", but the file will weigh less)"
 
 [programmLink]
 hash = "sha1-18f9a3fad6aacefe1b05eed23122800b391ff5ca"
@@ -315,8 +363,8 @@ hash = "sha1-4864057d626a868fa60f999bed3191d61d045ddc"
 other = "Save"
 
 [selectEncoder]
-hash = "sha1-db41d1c87b2fbe561bbdcc03919d3a55360bb7d8"
-other = "Converter:"
+hash = "sha1-88f3670b09758a3336057520a215058d61006abd"
+other = "Encoder:"
 
 [selectFFPathTitle]
 hash = "sha1-95581446a28d968ff1a027c623159a7eb08654cf"

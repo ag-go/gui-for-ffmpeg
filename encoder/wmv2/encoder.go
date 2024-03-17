@@ -2,15 +2,13 @@ package wmv2
 
 import encoder2 "git.kor-elf.net/kor-elf/gui-for-ffmpeg/encoder"
 
-type encoder struct {
-}
-
 func NewEncoder() encoder2.EncoderContract {
-	return &encoder{}
-}
+	parameters := map[string]encoder2.ParameterContract{}
+	getParams := func(parameters map[string]encoder2.ParameterContract) []string {
+		return []string{"-c:v", "wmv2"}
+	}
 
-func (e encoder) GetParams() []string {
-	return []string{"-c:v", "wmv2"}
+	return encoder2.NewEncoder("wmv2", parameters, getParams)
 }
 
 func NewData() encoder2.EncoderDataContract {
